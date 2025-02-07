@@ -7,3 +7,9 @@
 
 ### Live Site
 Bisa akses secara live melalui: [Live Site eCommerce](https://ecommerce.mansalman.my.id)
+
+### Akses Login
+username: admin@oc.com
+password: admin123
+
+atau bisa registrasi di halaman register
