@@ -31,7 +31,7 @@ class SocialiteController extends Controller
             $user = User::where('email', $socialUser->getEmail())->first();
             if(!$user){
                 $user = User::create([
-                    'name' => $socialUser->getName() ? $socialUser->getName() : $socialUser->getNicname(),
+                    'name' => $socialUser->getName() ? $socialUser->getName() : $socialUser->getNickname(),
                     'email' => $socialUser->getEmail(),
                     'password' => Str::random(10)
                 ]);
