@@ -2,17 +2,19 @@
 
 namespace App\Livewire;
 
-use App\Http\Requests\LoginRequest;
-use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Illuminate\Validation\ValidationException;
+use DutchCodingCompany\LivewireRecaptcha\ValidatesRecaptcha;
 
 class LoginPage extends Component
 {
     use LivewireAlert;
     public $email;
     public $password;
+    public string $gRecaptchaResponse;
     public $request;
 
 
@@ -26,10 +28,15 @@ class LoginPage extends Component
         return $request->rules();
     }
 
-    public function login(Request $request){
+    public function validateInput(){
+        // validasi menggunakan LoginRequest
+        $data = $this->validate($this->rules());
+        $this->login($data);
+    }
+
+    #[ValidatesRecaptcha]
+    public function login($data){
         try{
-            $data = $this->validate($this->rules());
-            // validasi menggunakan LoginRequest
             if(auth()->attempt($data)){
                 $this->flash('success', 'Halo ' . ucfirst(auth()->user()->name), [
                     'position' => 'top-end',

@@ -17,6 +17,7 @@ class RegisterPage extends Component
     public $email;
     public $password;
     public $password_confirmation;
+    public string $gRecaptchaResponse;
 
     public function updated($propertyName)
     {
@@ -28,10 +29,14 @@ class RegisterPage extends Component
         return $request->rules();
     }
 
-    public function register(){
+    public function validateInput(){
+        // validasi menggunakan RegisterRequest
+        $data = $this->validate($this->rules());
+        $this->register($data);
+    }
+
+    public function register($data){
         try{
-            // validasi menggunakan RegisterRequest
-            $data = $this->validate($this->rules());
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],

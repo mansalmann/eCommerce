@@ -18,13 +18,13 @@
                     <hr class="my-5 border-slate-300">
 
                     <!-- Form -->
-                    <form wire:submit.prevent="login">
+                    <form wire:submit.prevent="validateInput" wire:recaptcha>
                         <div class="grid gap-y-4">
                             <!-- Form Group -->
                             <div>
                                 <label for="email" class="block text-sm mb-2 dark:text-white">Email address</label>
                                 <div class="relative">
-                                    <input type="email" id="email" wire:model.live.debounce.300ms="email"
+                                    <input type="email" id="email" wire:model.live.debounce.1000ms="email"
                                         class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600">
                                     @error('email')
                                         <div class="absolute inset-y-0 end-0 flex items-center pointer-events-none pe-3">
@@ -50,7 +50,7 @@
                                         href="{{ route('forgot-password') }}">Forgot password?</a>
                                 </div>
                                 <div class="relative">
-                                    <input type="password" id="password" wire:model.live.debounce.300ms="password"
+                                    <input type="password" id="password" wire:model.live.debounce.1000ms="password"
                                         class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600">
                                     @error('password')
                                         <div class="absolute inset-y-0 end-0 flex items-center pointer-events-none pe-3">
@@ -67,12 +67,18 @@
                                 @enderror
                             </div>
                             <!-- End Form Group -->
-                            <button type="submit" wire:target="login"
+
+                            <!-- Capatcha Element -->
+                            <div>
+                                <div wire:ignore id="g-recaptcha-element"></div>
+                            </div>
+                            
+                            <button type="submit" wire:target="validateInput" wire:submit.ignore
                                 class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
                                 wire:loading.class.remove="bg-gray-800 pointer-events-none">
-                                <span wire:loading.class="hidden" wire:target="login">Sign in</span>
+                                <span wire:loading.class="hidden" wire:target="validateInput">Sign in</span>
                                 <span wire:loading.class.remove="hidden opacity-50 cursor-not-allowed" class="hidden"
-                                    wire:target="login">
+                                    wire:target="validateInput">
                                     <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block"
                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10"
@@ -105,10 +111,12 @@
                                 </a>
                             </div>
                             </div>
+                            
                         </div>
                     </form>
                     <!-- End Form -->
                 </div>
             </div>
     </div>
+    @include('parts.auth.captcha')
 </div>

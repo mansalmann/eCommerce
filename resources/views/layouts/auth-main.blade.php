@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>OnlineClothing</title>
+	{{-- {!! htmlScriptTagJsApi() !!} --}}
 	@vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body style="
@@ -19,5 +20,6 @@
 	<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<x-livewire-alert::scripts />
 	<script src="./node_modules/preline/dist/preline.js"></script>
+
 </body>
 </html>
