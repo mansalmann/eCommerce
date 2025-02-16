@@ -34,8 +34,7 @@ class LoginPage extends Component
         $this->login($data);
     }
 
-    #[ValidatesRecaptcha]
-    public function login($data){
+    #[ValidatesRecaptcha]    public function login($data){
         try{
             if(auth()->attempt($data)){
                 $this->flash('success', 'Halo ' . ucfirst(auth()->user()->name), [

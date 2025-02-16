@@ -34,8 +34,8 @@ Route::middleware(['auth'])->group(function(){
     
     Route::get('orders', [OrderController::class, 'showUserOrderPage'])->name('user-orders');
     Route::get('orders/{orderId}', [OrderController::class, 'showUserOrderDetailPage'])->name('user-detail-order');
-    Route::get('orders/status/success', [OrderController::class, 'showOrderSuccessPage'])->name('order-success');
-    Route::get('orders/status/canceled', [OrderController::class, 'showOrderCanceledPage'])->name('order-canceled');
+    Route::get('orders/status/success/{invoiceId}', [OrderController::class, 'showOrderSuccessPage'])->name('order-success');
+    Route::get('orders/status/canceled/{invoiceId}', [OrderController::class, 'showOrderCanceledPage'])->name('order-canceled');
     Route::get('logout', function(){
         auth()->logout();
         return redirect('/');

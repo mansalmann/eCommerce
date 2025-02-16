@@ -66,6 +66,7 @@ class ProductResource extends Resource
                                 ])
                                 ->imageEditorMode(2)
                                 ->previewable(true)
+                                
                                 ->minSize(10)
                                 ->maxSize(2048)
                                 ->disk('public')
@@ -77,13 +78,17 @@ class ProductResource extends Resource
 
                 Forms\Components\Group::make()
                     ->schema([
-                    Forms\Components\Section::make('Product Price')
+                    Forms\Components\Section::make('Product Price and Stock')
                         ->schema([
                             Forms\Components\TextInput::make('price')
                                 ->required()
                                 ->numeric()
                                 ->minValue(0)
                                 ->prefix('Rp.'),
+                            Forms\Components\TextInput::make('stock')
+                                    ->required()
+                                    ->numeric()
+                                    ->minValue(1)
                             ]),
                     Forms\Components\Section::make('Product Associations')
                     ->schema([
@@ -139,7 +144,15 @@ class ProductResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                    ->before(function (Product $product) {
+                        $product = Product::where('id', $product->id)->first(['id', 'images']);
+                        foreach($product->images as $image){
+                            if(Storage::disk('public')->exists($image)){
+                                Storage::disk('public')->delete($image);
+                            }
+                        }
+                    }),
                 ]),
             ])
             ->bulkActions([
@@ -163,13 +176,7 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
-    }
+    }    
 
-    public function afterCreate(): void
-    {
-        $oldFiles = Storage::files('livewire-tmp');
-        foreach ($oldFiles as $file) {
-            Storage::delete($file);
-        }
-    }
+
 }

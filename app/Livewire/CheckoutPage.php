@@ -13,6 +13,8 @@ use Illuminate\Support\Str;
 use Xendit\Invoice\InvoiceApi;
 use App\Helpers\CartManagement;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\OrderRequest;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
 use Xendit\Invoice\CreateInvoiceRequest;
 
@@ -26,35 +28,53 @@ class CheckoutPage extends Component
     public $cart_items;
     public $grand_total;
     public $data = [];
+    public $invoiceId;
 
 
-    public function mount(){
+    public function mount()
+    {
+
         $this->cart_items = CartManagement::getCartItemsFromDatabase();
+        $this->invoiceId = "Invoice-" . time() . "-" . (string) Str::uuid();
 
         // hitung total harga dari seluruh barang yang dipesan
-        foreach($this->cart_items as $key => $item){
-            if($item->product->stock > 0){
+        foreach ($this->cart_items as $key => $item) {
+            if ($item->product->stock > 0) {
                 $this->data[] = ['total_amount' => $this->cart_items->toArray()[$key]['total_amount']];
-            }else{
+            } else {
                 $this->data[] = ['total_amount' => 0];
             }
         }
         $this->grand_total = CartManagement::calculateGrandTotal($this->data);
-        if(count($this->cart_items) == 0){
+        if (count($this->cart_items) == 0) {
             return redirect()->route('products');
         }
     }
-    
-    public function placeOrder(){
-        $this->validate([
-            'first_name' => ['required'],
-            'last_name' => ['required'],
-            'phone' => ['required'],
-            'address' => ['required'],
-            'payment_method' => ['required'],
-        ]);
 
+
+    public function updated($propertyName)
+    {
+        $this->validateOnly($propertyName);
+    }
+
+    protected function rules()
+    {
+        $request = new OrderRequest();
+        return $request->rules();
+    }
+
+    public function validateInput()
+    {
+        // validasi menggunakan OrderRequest
+        $this->validate($this->rules());
+        $this->placeOrder();
+    }
+
+    public function placeOrder()
+    {
+        // membuat data baru dari order
         $order = new Order();
+        $order->invoice_id = $this->invoiceId;
         $order->user_id = auth()->user()->id;
         $order->grand_total = CartManagement::calculateGrandTotal($this->data);
         $order->payment_method = $this->payment_method;
@@ -62,8 +82,8 @@ class CheckoutPage extends Component
         $order->status = 'new';
         $order->notes = 'Order placed by ' . auth()->user()->name;
         $order->save();
-        
 
+        // mengisi data alamat dari setiap order
         $address = new Address();
         $address->order_id = $order->id;
         $address->first_name = $this->first_name;
@@ -74,67 +94,62 @@ class CheckoutPage extends Component
 
         // membuat data order items yang baru
         $data = [];
-        foreach($this->cart_items as $item){
-            if($item->product->stock > 0){
+        foreach ($this->cart_items as $item) {
+            if ($item->product->stock > 0) {
                 $data[] = $item->toArray();
             }
         }
         $order->items()->createMany($data);
         $items = OrderItem::with('product')->where('order_id', $order->id)->get(['id', 'product_id', 'quantity'])->toArray();
-        foreach($items as $item){
-                DB::beginTransaction();
-                $product = Product::find( $item['product_id']);
-                // perbarui stok barang yang dibeli berdasarkan product id dari tabel order_items
-                if($product && $product->stock > 0){
-                    $product->update([
+        foreach ($items as $item) {
+            DB::beginTransaction();
+            $product = Product::find($item['product_id']);
+            // perbarui stok barang yang dibeli berdasarkan product id dari tabel order_items
+            if ($product && $product->stock > 0) {
+                $product->update([
                     'stock' => $product->stock - $item['quantity']
-                    ]);
-                    DB::commit();
-                }else{
-                    DB::rollBack();
-                }
+                ]);
+                DB::commit();
+            } else {
+                DB::rollBack();
+            }
         }
 
-        if($this->payment_method === 'virtual_transfer'){
-            // Set your Merchant Server Key
-            \Midtrans\Config::$serverKey = config('midtrans.serverKey');
-            // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
-            \Midtrans\Config::$isProduction = config('midtrans.isProduction');
-            // Set sanitization on (default)
-            \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
-            // Set 3DS transaction for credit card to true
-            \Midtrans\Config::$is3ds = config('midtrans.is3ds');
+        if ($this->payment_method === 'online_payment') {
+            Configuration::setXenditKey(env('XENDIT_API_KEY'));
+            $apiInstance = new InvoiceApi();
+            $create_invoice_request = new CreateInvoiceRequest([
+                'external_id' => $this->invoiceId,
+                'amount' => $this->grand_total,
+                'invoice_duration' => 86400,
+                'currency' => 'IDR',
+                'reminder_time' => 1,
+                'customer' => [
+                    'given_names' => $address->full_name,
+                    'mobile_number' => $this->phone
+                ],
+                "success_redirect_url" => route('order-success', ['invoiceId' => $this->invoiceId]),
+                "failure_redirect_url" => route('order-canceled', ['invoiceId' => $this->invoiceId])
+            ]);
 
-            $params = array(
-                'transaction_details' => array(
-                    'order_id' => $order->id,
-                    'gross_amount' => $this->grand_total
-                ),
-                'customer_details' => array(
-                    'first_name' => $this->first_name,
-                    'address' => $this->address,
-                    'phone' => $this->phone,
-                ),
-            );
 
-            // generate payment url
-            $redirect_url = \Midtrans\Snap::createTransaction($params)->redirect_url;
-
-            if($redirect_url){
-                CartManagement::clearCartItems();
-            }else{
-                $redirect_url = route('order-canceled');
+            try {
+                $result = $apiInstance->createInvoice($create_invoice_request);
+                $redirect_url = $result['invoice_url'];
+            } catch (\Xendit\XenditSdkException $e) {
+                dd($e);
+                return redirect()->route('order-canceled', ['invoiceId' => $this->invoiceId]);
             }
-            
-    }else{
-        CartManagement::clearCartItems();
-        $redirect_url = route('order-success');
-    }
-        
+
+        } else {
+            $redirect_url = route('order-success', ['invoiceId' => $this->invoiceId]); // khusus metode pembayaran Cash on Delivery
+        }
+
+        CartManagement::clearCartItems(); // hapus item di keranjang
         Mail::to(request()->user())->send(new OrderPlaced($order));
         return redirect($redirect_url);
     }
-    
+
     public function render()
     {
         return view('livewire.checkout-page', [

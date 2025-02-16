@@ -18,9 +18,9 @@
         <div class="flex flex-wrap items-center pb-4 mb-10 border-b border-gray-200 dark:border-gray-700">
           <div class="w-full px-4 mb-4 md:w-1/4">
             <p class="mb-2 text-sm leading-5 text-gray-600 dark:text-gray-400 ">
-              Order Number: </p>
+              Invoice Number: </p>
             <p class="text-base font-semibold leading-4 text-gray-800 dark:text-gray-400">
-              {{ $order->id }}</p>
+              {{ $order->invoice_id }}</p>
           </div>
           <div class="w-full px-4 mb-4 md:w-1/4">
             <p class="mb-2 text-sm leading-5 text-gray-600 dark:text-gray-400 ">

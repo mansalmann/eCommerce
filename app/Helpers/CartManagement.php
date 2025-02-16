@@ -43,7 +43,7 @@ class CartManagement {
                     'unit_amount' => $product->price,
                     'total_amount' => $product->stock > 0 ? $product->price : 0,
                 ]);
-                $cart_items[] = $data->toArray();
+                $cart_items[] = $data;
             }
         }
 
@@ -90,7 +90,7 @@ class CartManagement {
                     'unit_amount' => $product->price,
                     'total_amount' => $product->stock > 0 ? $product->price : 0,
                 ]);
-                $cart_items[] = $data->toArray();
+                $cart_items[] = $data;
             }
         }
 

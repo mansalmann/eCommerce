@@ -1,4 +1,4 @@
 @extends('layouts.main')
 @section('content')
-@livewire('order-success-page')
+@livewire('order-cancel-page', ['invoiceId' => $invoiceId])
 @endsection

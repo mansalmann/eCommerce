@@ -21,7 +21,6 @@
         "laravel/socialite": "^5.18",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
-        "midtrans/midtrans-php": "^2.6",
         "xendit/xendit-php": "^6.1.0"
     },
     "require-dev": {

@@ -2,7 +2,7 @@
     <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">
         Checkout
     </h1>
-    <form wire:submit.prevent="placeOrder">
+    <form wire:submit.prevent="validateInput">
         <div class="grid grid-cols-12 gap-4">
             <div class="md:col-span-12 lg:col-span-8 col-span-12">
 
@@ -68,15 +68,15 @@
                         Select Payment Method
                     </div>
                     <ul class="grid w-full gap-6 md:grid-cols-2">
-                        {{-- <li>
+                        <li>
                             <input wire:model="payment_method" class="hidden peer" type="radio"
-                                value="virtual_transfer" id="virtual_transfer" />
+                                value="online_payment" id="online_payment" />
                             <label
                                 class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-                                for="virtual_transfer">
+                                for="online_payment">
                                 <div class="block">
                                     <div class="w-full text-lg font-semibold">
-                                        Virtual Transfer
+                                        Online Payment
                                     </div>
                                 </div>
                                 <svg aria-hidden="true" class="w-5 h-5 ms-3 rtl:rotate-180" fill="none"
@@ -86,7 +86,7 @@
                                     </path>
                                 </svg>
                             </label>
-                        </li> --}}
+                        </li>
                         <li>
                             <input wire:model="payment_method" class="hidden peer" type="radio" value="cod"
                                 id="cod">

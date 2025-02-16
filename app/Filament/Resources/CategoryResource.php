@@ -59,7 +59,7 @@ class CategoryResource extends Resource
                             ->directory('category-images')
                             ->visibility('public'),
                     Forms\Components\Toggle::make('is_active')
-                                ->required(),
+                            ->required(),
                 ])
             ]);
     }
@@ -115,14 +115,5 @@ class CategoryResource extends Resource
             'create' => Pages\CreateCategory::route('/create'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
-    }
-
-
-    public function afterCreate(): void
-    {
-        $oldFiles = Storage::files('livewire-tmp');
-        foreach ($oldFiles as $file) {
-            Storage::delete($file);
-        }
     }
 }
