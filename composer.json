@@ -13,6 +13,7 @@
     ],
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.1",
         "dutchcodingcompany/livewire-recaptcha": "^1.0",
         "filament/filament": "^3.2",
         "jantinnerezo/livewire-alert": "^3.0",
@@ -20,7 +21,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.18",
         "laravel/tinker": "^2.9",
-        "livewire/livewire": "^3.5",
+        "livewire/livewire": "^3.5",        
         "xendit/xendit-php": "^6.1.0"
     },
     "require-dev": {

@@ -1,12 +1,9 @@
 <?php
 
 use App\Http\Controllers\SocialiteController;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
-use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 

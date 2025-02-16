@@ -1,5 +1,11 @@
 <div class="w-full max-w-[85rem] py-10 px-4 sm:px-6 lg:px-8 mx-auto">
-    <h1 class="text-4xl font-bold text-slate-500">Order Details</h1>
+    <div class="flex justify-between items-center">
+        <h1 class="text-4xl font-bold text-slate-500">Order Details</h1>
+        <button wire:click="downloadPdf"
+            class="w-full text-center px-4 py-2 text-gray-300 border border-blue-500 rounded-md md:w-auto hover:text-white bg-blue-600 hover:bg-blue-900 dark:border-blue-600 dark:hover:bg-blue-900 dark:text-gray-300">
+            Export to PDF
+        </button>
+    </div>
 
     <!-- Grid -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-5">
@@ -24,7 +30,7 @@
                             Customer
                         </p>
                     </div>
-                    <div class="mt-1 flex items-center gap-x-2">
+                    <div class="mt-1 flex items-center gap-x-2 dark:text-white">
                         <div>{{ $address->full_name }}</div>
                     </div>
                 </div>
